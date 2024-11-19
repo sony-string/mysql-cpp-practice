@@ -30,3 +30,15 @@
 *.exe
 *.out
 *.app
+
+
+# vscode
+.vscode
+.vscode/*
+
+# executable binary 
+sev
+
+# build outputs
+out
+out/*
