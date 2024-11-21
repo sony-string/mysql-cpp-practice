@@ -1,6 +1,6 @@
 CC = g++
 CFLAGS = -fPIC -Wall -std=c++23 -g -DDEBUG
-LDFLAGS = -Iinclude -Llibs -lmysqlcppconn
+LDFLAGS = -Iinclude -Llibs `mysql_config --cflags --libs`
 
 UNITTEST_LDFLAGS = -lmysqlcpp -lcunit -Wl,-rpath,libs
 
