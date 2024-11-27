@@ -43,3 +43,15 @@
    ```bash
    make test
    ```
+
+# 실행 방법
+
+우선 DB 서버에 대한 정보를 환경 변수로 등록하여야 합니다.
+아래의 환경 변수를 입력하시면 됩니다.
+```bash
+export "MYSQL_SERVER"="MySQL 서버 주소"
+export "MYSQL_PORTNUM"="MySQL 서버 포트"
+export "MYSQL_USER"="MySQL 접속 username"
+export "MYSQL_PASSWORD"="MySQL 접속 password"
+export "MYSQL_DATABASE"="접속할 MySQL 서버에서 사용할 database 이름"
+```
