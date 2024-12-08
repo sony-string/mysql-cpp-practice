@@ -3,6 +3,8 @@
 #include <iostream>
 #include <cstdlib>
 
+#include "utils.h"
+
 void search_books(MYSQL *conn) {
     if (mysql_query(conn, "SELECT * FROM Book")) {
         std::cerr << "Query error: " << mysql_error(conn) << std::endl;
@@ -71,6 +73,10 @@ int main() {
         std::cout << "1. search\t2. insert\t3. delete" << std::endl;
         std::cin >> query_num;
 
+        if (std::cin.fail()) {
+            clear_cin_error();
+        }
+
         if (query_num == 1) {
             search_books(conn);
         } else if (query_num == 2) {
@@ -79,12 +85,18 @@ int main() {
 
             std::cout << "<bookid> <bookname> <publisher> <price>" << std::endl;
             std::cin >> bookid >> bookname >> publisher >> price;
+            if (std::cin.fail()) {
+                clear_cin_error();
+            }
             insert_book(conn, bookid, bookname, publisher, price);
         } else if (query_num == 3) {
              int bookid;
 
              std::cout << "<bookid>" << std::endl;
              std::cin >> bookid;
+             if (std::cin.fail()) {
+                clear_cin_error();
+            }
              deleteBook(conn, bookid);
         }
     }
