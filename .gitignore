@@ -42,3 +42,12 @@ sev
 # build outputs
 out
 out/*
+
+temp
+temp/*
+
+include
+include/*
+
+libs
+libs/*
