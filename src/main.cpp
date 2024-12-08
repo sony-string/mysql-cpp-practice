@@ -64,7 +64,7 @@ int main() {
     conn = mysql_init(nullptr);
 
     if (!mysql_real_connect(conn, server, user, password, database, portnum, nullptr, 0)) {
-        std::cerr << "Connection error: " << mysql_error(conn) << std::endl;
+        Logger(ll_critical, std::string(mysql_error(conn))).log();
         return 1;
     }
 
