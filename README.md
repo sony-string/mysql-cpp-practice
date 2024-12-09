@@ -10,7 +10,14 @@
 프로젝트를 빌드하고 실행하기 위해 다음 사항을 충족해야 합니다:
 - gcc
 ```bash
-gcc version 13.2.0 (Ubuntu 13.2.0-23ubuntu4)
+gcc version 13.2.0
+# 더 높은 버전 또한 지원하며, 더 낮은 버전에 대해서는 확인되지 않았습니다.
+```
+
+- OS
+```bash
+Ubuntu 24.04.1 LTS
+# OS가 다를 시 MySQL 에 대한 라이브러리만 수정해주면 됩니다.
 ```
 
 # 빌드 방법
@@ -48,4 +55,9 @@ export "MYSQL_SERVER"="MySQL 서버 주소:포트 번호"
 export "MYSQL_USER"="MySQL 접속 username"
 export "MYSQL_PASSWORD"="MySQL 접속 password"
 export "MYSQL_DATABASE"="접속할 MySQL 서버에서 사용할 database 이름"
+
+```
+이제 실행할 수 있습니다.
+```bash
+./sev
 ```
