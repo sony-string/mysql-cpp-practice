@@ -36,7 +36,7 @@ enum loglevel {
     ll_critical
 };
 
-std::string get_loglevel_string(loglevel level) {
+static std::string get_loglevel_string(loglevel level) {
     switch (level) {
     case ll_trace:
         return "TRACE";
@@ -88,3 +88,22 @@ public:
  * @brief Recover error of std::cin error.
  */
 void clear_cin_error();
+
+/**
+ * @brief Helper function to print a separator line for the table.
+ * @param column_widths Vector of column widths for formatting.
+ */
+void print_separator(const std::vector<int>& column_widths);
+
+/**
+ * @brief Helper function to print a row with column values in the table.
+ * @param values Vector of string values for the row.
+ * @param column_widths Vector of column widths for formatting.
+ */
+void print_row(const std::vector<std::string>& values, const std::vector<int>& column_widths);
+
+/**
+ * @brief Prints the ResultSet as a table to the console.
+ * @param res A unique pointer to the ResultSet containing the query results.
+ */
+void print_result_set(std::unique_ptr<sql::ResultSet>& res);
