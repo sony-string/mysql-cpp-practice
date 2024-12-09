@@ -8,7 +8,10 @@
 # Requirements
 
 프로젝트를 빌드하고 실행하기 위해 다음 사항을 충족해야 합니다:
-- Docker 설치 (Docker를 통해 빌드 환경을 제공합니다)
+- gcc
+```bash
+gcc version 13.2.0 (Ubuntu 13.2.0-23ubuntu4)
+```
 
 # 빌드 방법
 
@@ -20,28 +23,20 @@
    cd mysql-cpp-practice
    ```
 
-2. Docker 환경을 준비합니다:
-   Dockerfile이 프로젝트 루트 디렉토리에 위치하고 있습니다. 다음 명령어를 사용하여 Docker 이미지를 빌드합니다.
-   ```bash
-   docker build -t your-image-name .
-   ```
-
-3. Docker 컨테이너를 시작합니다:
-   빌드된 이미지를 바탕으로 컨테이너를 실행합니다.
-   ```bash
-   docker run -it --rm your-image-name
-   ```
-
-4. 프로젝트를 빌드합니다:
+2. 프로젝트를 빌드합니다:
    컨테이너 내에서 다음 명령어를 실행하여 프로젝트를 빌드합니다.
    ```bash
-   make binary
+   make -j8
    ```
+  - 컴파일 옵션을 지정할 수 있습니다.
+  ```bash
+  make -j8 ADD="원하는 컴파일 옵션" 
+  ```
 
-5. (향후) 유닛 테스트:
+3. (향후) 유닛 테스트:
    현재 유닛 테스트는 통합되지 않았으나, 추가될 예정입니다. 추가되면 다음 명령어로 테스트를 수행할 수 있습니다.
    ```bash
-   make test
+   make test -j8
    ```
 
 # 실행 방법
@@ -49,8 +44,7 @@
 우선 DB 서버에 대한 정보를 환경 변수로 등록하여야 합니다.
 아래의 환경 변수를 입력하시면 됩니다.
 ```bash
-export "MYSQL_SERVER"="MySQL 서버 주소"
-export "MYSQL_PORTNUM"="MySQL 서버 포트"
+export "MYSQL_SERVER"="MySQL 서버 주소:포트 번호"
 export "MYSQL_USER"="MySQL 접속 username"
 export "MYSQL_PASSWORD"="MySQL 접속 password"
 export "MYSQL_DATABASE"="접속할 MySQL 서버에서 사용할 database 이름"
