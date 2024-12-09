@@ -1,108 +1,66 @@
-#include <mysql/mysql.h>
-#include <mysql_error.h>
+#include <cppconn/driver.h>
+#include <cppconn/exception.h>
+#include <cppconn/prepared_statement.h>
+#include <cppconn/resultset.h>
+
 #include <iostream>
-#include <cstdlib>
+#include <vector>
+#include <memory>
 
 #include "utils.h"
-
-void search_books(MYSQL *conn) {
-    if (mysql_query(conn, "SELECT * FROM Book")) {
-        std::cerr << "Query error: " << mysql_error(conn) << std::endl;
-        return;
-    }
-
-    MYSQL_RES *res = mysql_store_result(conn);
-
-    if (res == nullptr) {
-        std::cerr << "Store result error: " << mysql_error(conn) << std::endl;
-        return;
-    }
-
-    int num_fields = mysql_num_fields(res);
-    MYSQL_ROW row;
-    while ((row = mysql_fetch_row(res))) {
-        for(int i = 0; i < num_fields; i++) {
-            std::cout << (row[i] ? row[i] : "NULL") << "\t";
-        }
-        std::cout << std::endl;
-    }
-
-    mysql_free_result(res);
-}
-
-void insert_book(MYSQL *conn, int bookid, const std::string &bookname, const std::string &publisher, int price) {
-    std::string query = "INSERT INTO Book (bookid, bookname, publisher, price) VALUES (" +
-        std::to_string(bookid) + ", '" + bookname + "', '" + publisher + "', " + std::to_string(price) + ")";
-    
-    if (mysql_query(conn, query.c_str())) {
-        return;
-    }
-
-    std::cout << "Book inserted successfully" << std::endl;
-}
-
-void deleteBook(MYSQL *conn, int bookid) {
-    std::string query = "DELETE FROM Book WHERE bookid = " + std::to_string(bookid);
-    
-    if (mysql_query(conn, query.c_str())) {
-        return;
-    }
-
-    std::cout << "Book deleted successfully" << std::endl;
-}
+#include "service/StudentTable.h"
 
 
 int main() {
-    MYSQL *conn;
+    sql::Driver *driver = get_driver_instance();
 
-    const char *server      = std::getenv("MYSQL_SERVER");  
-    const char *user        = std::getenv("MYSQL_USER");  
-    const char *password    = std::getenv("MYSQL_PASSWORD");
-    const char *database    = std::getenv("MYSQL_DATABASE");   
-    const int   portnum     = std::atoi(std::getenv("MYSQL_PORTNUM"));
+    const std::string server = std::getenv("MYSQL_SERVER");
+    const std::string user = std::getenv("MYSQL_USER");
+    const std::string password = std::getenv("MYSQL_PASSWORD");
+    const std::string database = std::getenv("MYSQL_DATABASE");
 
-    conn = mysql_init(nullptr);
+    std::shared_ptr<sql::Connection> con;
 
-    if (!mysql_real_connect(conn, server, user, password, database, portnum, nullptr, 0)) {
-        Logger(ll_critical, std::string(mysql_error(conn))).log();
-        return 1;
+    try {
+        con = std::shared_ptr<sql::Connection>(driver->connect("tcp://" + server, user, password));
+        con->setSchema(database);
+    } catch (sql::SQLException &e) {
+        Logger(ll_critical, std::string(e.what())).log();
+        exit(EXIT_FAILURE);
     }
 
+    StudentTable student_table(con);
+    
     while (true) {
         int query_num;
-        std::cout << "1. search\t2. insert\t3. delete" << std::endl;
+        std::cout << "0. info  \t1. search\t2. insert\t3. delete\t 4. update" << std::endl;
         std::cin >> query_num;
 
         if (std::cin.fail()) {
             clear_cin_error();
         }
 
-        if (query_num == 1) {
-            search_books(conn);
+        if (query_num == 0) {
+            student_table.basic_show();
+        } else if (query_num == 1) {
+            std::string student_name;
+            std::cout << "name = ";
+            std::cin >> student_name;
+
+            auto search_res = student_table.read_student_by_field("name", student_name);                 
+            if (search_res)
+                print_result_set(search_res);
         } else if (query_num == 2) {
-            int bookid, price;
-            std::string bookname, publisher;
+            std::string student_name, dep;
+            std::cout << "name = ";
+            std::cin >> student_name;
 
-            std::cout << "<bookid> <bookname> <publisher> <price>" << std::endl;
-            std::cin >> bookid >> bookname >> publisher >> price;
-            if (std::cin.fail()) {
-                clear_cin_error();
-            }
-            insert_book(conn, bookid, bookname, publisher, price);
-        } else if (query_num == 3) {
-             int bookid;
+            std::cout << "department = ";
+            std::cin >> dep;            
 
-             std::cout << "<bookid>" << std::endl;
-             std::cin >> bookid;
-             if (std::cin.fail()) {
-                clear_cin_error();
-            }
-             deleteBook(conn, bookid);
+            student_table.create_student(student_name, dep);
         }
     }
-    
-    
-    mysql_close(conn);
 
     return 0;
 }
