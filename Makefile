@@ -1,8 +1,7 @@
 CC = g++
-CFLAGS = -fPIC -Wall -std=c++23 -g -DDEBUG
+ADD = -g -DDEBUG
+CFLAGS = -fPIC -Wall -std=c++23 $(ADD)
 LDFLAGS = -Iinclude -Llibs `mysql_config --cflags --libs`
-
-UNITTEST_LDFLAGS = -lmysqlcpp -lcunit -Wl,-rpath,libs
 
 bin = sev
 unittest = unittest # exists only for unittest
