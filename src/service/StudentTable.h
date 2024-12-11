@@ -39,6 +39,13 @@ public:
     std::unique_ptr<sql::ResultSet>  read_student_by_field(const std::string &field, const std::string &value);
 
     /**
+     * @brief Reads all student record.
+     * @return A unique pointer to a ResultSet containing all students records, or nullptr if an error occurred.
+     * @retval nullptr An error occurred.
+     */
+    std::unique_ptr<sql::ResultSet> read_all_student();
+
+    /**
      * @brief Updates a student's name based on their ID.
      * @param student_id The ID of the student to update.
      * @param new_name The new name for the student.
