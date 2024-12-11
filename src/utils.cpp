@@ -2,15 +2,21 @@
 #include <vector>
 #include <memory>
 #include <iomanip>
-#include <cppconn/resultset.h>
+#include <limits>
 
-#include <mysql_driver.h>
+#include <cppconn/resultset.h>
 
 #include "utils.h"
 
+constexpr auto max_size = std::numeric_limits<std::streamsize>::max();
+
 void clear_cin_error() {
     std::cin.clear();            
-    while (std::cin.get() == '\n'); 
+    std::cin.ignore(max_size, '\n');
+}
+
+void clear_cin_buffer() {
+    std::cin.ignore(max_size, '\n');
 }
 
 void print_separator(const std::vector<int>& column_widths) {
