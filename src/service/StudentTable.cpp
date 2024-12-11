@@ -29,6 +29,10 @@ std::unique_ptr<sql::ResultSet> StudentTable::read_student_by_field(const std::s
     return basic_string_select(conditions);
 }
 
+std::unique_ptr<sql::ResultSet> StudentTable::read_all_student() {
+    return basic_select_all();
+}
+
 bool StudentTable::update_student_name(int student_id, const std::string &new_name) {
     std::map<std::string, std::string> conditions;
     conditions["student_id"] = std::to_string(student_id);
