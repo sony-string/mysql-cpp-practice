@@ -162,3 +162,18 @@ std::unique_ptr<sql::ResultSet> BasicTable::basic_select(std::map<std::string, s
         return nullptr;
     }
 }
+
+std::unique_ptr<sql::ResultSet> BasicTable::basic_select_all() {
+    try {
+        std::string query = "SELECT * FROM " + table_name;        
+
+        std::unique_ptr<sql::PreparedStatement> pstmt(con->prepareStatement(query));
+        std::unique_ptr<sql::ResultSet> res(pstmt->executeQuery());
+        Logger(ll_info, "executeQuery: " + query).log();
+
+        return res;
+    } catch (sql::SQLException &e) {
+        Logger(ll_error, "Error in basic_select: " + std::string(e.what())).log();
+        return nullptr;
+    }
+}

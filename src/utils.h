@@ -3,6 +3,7 @@
 #include <ctime>
 #include <iostream>
 #include <string>
+#include <vector>
 
 enum loglevel {
     /**
