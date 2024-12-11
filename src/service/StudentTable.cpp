@@ -26,7 +26,7 @@ bool StudentTable::create_student(const std::string &name, const std::string &de
 std::unique_ptr<sql::ResultSet> StudentTable::read_student_by_field(const std::string &field, const std::string &value) {
     std::map<std::string, std::string> conditions;
     conditions[field] = value;
-    return basic_select(conditions);
+    return basic_string_select(conditions);
 }
 
 bool StudentTable::update_student_name(int student_id, const std::string &new_name) {
