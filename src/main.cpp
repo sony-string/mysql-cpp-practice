@@ -24,6 +24,7 @@ int main() {
     try {
         con = std::shared_ptr<sql::Connection>(driver->connect("tcp://" + server, user, password));
         con->setSchema(database);
+        Logger(ll_info, "Successfully Connected to MySQL").log();
     } catch (sql::SQLException &e) {
         Logger(ll_critical, std::string(e.what())).log();
         exit(EXIT_FAILURE);
