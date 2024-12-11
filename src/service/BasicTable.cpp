@@ -121,13 +121,34 @@ bool BasicTable::basic_update(std::map<std::string, std::string> conditions, std
     }
 }
 
+std::unique_ptr<sql::ResultSet> BasicTable::basic_string_select(std::map<std::string, std::string> conditions) {    
+    try {
+        std::string query = "SELECT * FROM " + table_name + " WHERE ";
+        bool first = true;
+        for (const auto &pair : conditions) {
+            if (!first) query += " AND ";
+            query += pair.first + " like '%" + pair.second + "%'";
+            first = false;
+        }
+
+        std::unique_ptr<sql::PreparedStatement> pstmt(con->prepareStatement(query));
+        std::unique_ptr<sql::ResultSet> res(pstmt->executeQuery());
+        Logger(ll_info, "executeQuery: " + query).log();
+
+        return res;
+    } catch (sql::SQLException &e) {
+        Logger(ll_error, "Error in basic_select: " + std::string(e.what())).log();
+        return nullptr;
+    }
+}
+
 std::unique_ptr<sql::ResultSet> BasicTable::basic_select(std::map<std::string, std::string> conditions) {    
     try {
         std::string query = "SELECT * FROM " + table_name + " WHERE ";
         bool first = true;
         for (const auto &pair : conditions) {
             if (!first) query += " AND ";
-            query += pair.first + "='" + pair.second + "'";
+            query += pair.first + " = '" + pair.second + "'";
             first = false;
         }
 
