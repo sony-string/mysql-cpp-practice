@@ -111,36 +111,31 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
+    Logger(ll_info, "Initiation").log();
     StudentTable student_table(con);
-    
+
     while (true) {
         int query_num;
-        std::cout << "0. info  \t1. search\t2. insert\t3. delete\t 4. update" << std::endl;
+        std::cout << "\n<<Select Table for Service>>\n\n";
+        std::cout << "1. Club\t\t2. Student\n3. Activity\t4. Gathering\n"
+                  << "5. Professor\t6. Result\n7. Location\t8. Equipment\n";
+
         std::cin >> query_num;
 
         if (std::cin.fail()) {
             clear_cin_error();
+            wrong_input_log.log();
+            continue;
         }
 
-        if (query_num == 0) {
-            student_table.basic_show();
-        } else if (query_num == 1) {
-            std::string student_name;
-            std::cout << "name = ";
-            std::cin >> student_name;
-
-            auto search_res = student_table.read_student_by_field("name", student_name);                 
-            if (search_res)
-                print_result_set(search_res);
-        } else if (query_num == 2) {
-            std::string student_name, dep;
-            std::cout << "name = ";
-            std::cin >> student_name;
-
-            std::cout << "department = ";
-            std::cin >> dep;            
-
-            student_table.create_student(student_name, dep);
+        switch (query_num) {
+        case 1:
+            break;
+        case 2:
+            student_menu(student_table);
+            break;
+        default:
+            break;
         }
     }
 
