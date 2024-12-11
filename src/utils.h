@@ -90,6 +90,11 @@ public:
 void clear_cin_error();
 
 /**
+ * @brief Clear the buffer of std::cin.
+ */
+void clear_cin_buffer();
+
+/**
  * @brief Helper function to print a separator line for the table.
  * @param column_widths Vector of column widths for formatting.
  */
