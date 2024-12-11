@@ -63,6 +63,15 @@ protected:
      * @retval nullptr An error occurred.
      */
     std::unique_ptr<sql::ResultSet> basic_select(std::map<std::string, std::string> conditions);
+    
+    /**
+     * @brief Selects tuples from the table matching the given conditions.
+     * @param conditions A map of column names to values that identify the tuple.
+     * All fields need to be string, then this query will find values including value of conditions.
+     * @return A unique pointer to a ResultSet containing the query results, or nullptr if an error occurred.
+     * @retval nullptr An error occurred.
+     */
+    std::unique_ptr<sql::ResultSet> basic_string_select(std::map<std::string, std::string> conditions);   
 
     /// @brief Destructor for BasicTable.
     virtual ~BasicTable() {}
