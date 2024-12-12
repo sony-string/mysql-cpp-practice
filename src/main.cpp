@@ -9,6 +9,7 @@
 
 #include "service/ClubStudentTable.h"
 #include "service/ClubTable.h"
+#include "service/GatheringTable.h"
 #include "service/ProfessorTable.h"
 #include "service/StudentTable.h"
 #include "utils.h"
@@ -18,7 +19,7 @@ static Logger wrong_input_log = Logger(ll_error, "Incorrect Input");
 void student_menu(StudentTable &student_table) {
     while (true) {
         int query_num;
-        std::cout << "0. info  \t1. search\t2. create\t3. delete\t 4. update name\n5. Return to Menu" << std::endl;
+        std::cout << "0. info  1. search  2. create  3. delete 4. update name  5. Return to Menu" << std::endl;
         std::cin >> query_num;
 
         if (std::cin.fail()) {
@@ -98,70 +99,380 @@ void student_menu(StudentTable &student_table) {
     }
 }
 
-void club_manage_menu(ClubTable &club_table, ClubStudentTable &club_student_table, int club_id) {
+void club_members_menu(ClubTable &club_table, GatheringTable &gathering_table, int club_id) {
     while (true) {
         int query_num;
-        std::cout << "0. info  \t1. see info\t2. manage\t3.submit Result\t4. update club details\n5. Return to Back" << std::endl;
+        std::cout << "\n\n<< Members >>\n1. Search  2. Add  3. Delete  4. Return to back" << std::endl;
         std::cin >> query_num;
 
         if (std::cin.fail()) {
             clear_cin_error();
         }
 
-        if (query_num == 5)
+        if (query_num == 4)
             break;
-        
-        if (query_num == 4) {
-            std::cout << "Update for: 1. Name  2. Budget  3. Professor ID" << std::endl;
-            int update_option;
-            std::cin >> update_option;
 
-            if (std::cin.fail() || update_option < 1 || update_option > 3) {
+        if (query_num == 1) {
+            int search_option;
+            std::cout << "Search by: 0. all  1. name" << std::endl;
+            std::cin >> search_option;
+
+            if (std::cin.fail() || search_option < 0 || search_option > 1) {
                 clear_cin_error();
                 wrong_input_log.log();
                 continue;
             }
 
-            if (update_option == 1) {
+            if (search_option == 0) {
+                auto search_res = club_table.read_members_by_club_id(club_id);
+                if (search_res) {
+                    print_result_set(search_res);
+                }
+            } else if (search_option == 1) {
                 clear_cin_buffer();
-                std::string new_name;
-                std::cout << "New Name = ";
-                std::getline(std::cin, new_name);
+                std::string search_name;
+                std::cout << "Search for Name = ";
+                std::getline(std::cin, search_name);
 
-                club_table.update_club_name(club_id, new_name);
-            } else if (update_option == 2) {
-                double new_budget;
-                std::cout << "New Budget = ";
-                std::cin >> new_budget;
-
-                if (std::cin.fail()) {
-                    clear_cin_error();
-                    wrong_input_log.log();
-                    continue;
+                auto search_res = club_table.read_members_by_name_in_club(club_id, search_name);
+                if (search_res) {
+                    print_result_set(search_res);
                 }
+            }
+        } else if (query_num == 2) {
+            int student_id;
+            std::cout << "student_id = ";
+            std::cin >> student_id;
 
-                club_table.update_club_budget(club_id, new_budget);
-            } else if (update_option == 3) {
-                int new_prof_id;
-                std::cout << "New Professor ID = ";
-                std::cin >> new_prof_id;
+            if (std::cin.fail()) {
+                clear_cin_error();
+                wrong_input_log.log();
+                continue;
+            }
 
-                if (std::cin.fail()) {
-                    clear_cin_error();
-                    wrong_input_log.log();
-                    continue;
-                }
+            club_table.add_member(club_id, student_id);
+        } else if (query_num == 3) {
+            int student_id;
+            std::cout << "student_id = ";
+            std::cin >> student_id;
 
-                club_table.update_club_prof_id(club_id, new_prof_id);
+            if (std::cin.fail()) {
+                clear_cin_error();
+                wrong_input_log.log();
+                continue;
+            }
+
+            club_table.delete_member(club_id, student_id);
+        }
+    }
+}
+
+void gathering_menu(GatheringTable &gathering_table, int gathering_id) {
+    while (true) {
+        int option;
+        std::cout << "\n\n << Gathering >>\nChoose an option: 1. Add Member  2. Remove Member  3. View Members  4. Return to Back" << std::endl;
+        std::cin >> option;
+
+        if (std::cin.fail() || option < 1 || option > 4) {
+            clear_cin_error();
+            wrong_input_log.log();
+            continue;
+        }
+
+        if (option == 4) break;
+
+        if (option == 1) {
+            int student_id;
+            std::cout << "Enter student_id to add: ";
+            std::cin >> student_id;
+
+            if (std::cin.fail()) {
+                clear_cin_error();
+                wrong_input_log.log();
+                continue;
+            }
+
+            gathering_table.add_student_to_gathering(student_id, gathering_id);
+        } else if (option == 2) {
+            int student_id;
+            std::cout << "Enter student_id to remove: ";
+            std::cin >> student_id;
+
+            if (std::cin.fail()) {
+                clear_cin_error();
+                wrong_input_log.log();
+                continue;
+            }
+
+            gathering_table.delete_student_from_gathering(student_id, gathering_id);
+        } else if (option == 3) {
+            auto students = gathering_table.read_all_students_from_gathering(gathering_id);
+            if (students) {
+                print_result_set(students);
+            } else {
+                std::cout << "No students found for the given gathering." << std::endl;
             }
         }
     }
 }
 
-void club_menu(ClubTable &club_table, ClubStudentTable &club_student_table) {
+void club_activities_menu(ClubTable &club_table, GatheringTable &gathering_table, int club_id) {
     while (true) {
         int query_num;
-        std::cout << "0. info  \t1. search\t2. create\t3. delete\t 4. manage a club\n5. Return to Menu" << std::endl;
+        std::cout << "\n\n<< Activities >>\n1. Search  2. Add  3. Update  4. Delete  5. Gathering  6. Return to back" << std::endl;
+        std::cin >> query_num;
+
+        if (std::cin.fail()) {
+            clear_cin_error();
+            continue;
+        }
+
+        if (query_num == 6)
+            break;
+
+        if (query_num == 1) {
+            int search_option;
+            std::cout << "Search by: 0. all  1. activity_id  2. title  3. period" << std::endl;
+            std::cin >> search_option;
+
+            if (std::cin.fail() || search_option < 0 || search_option > 3) {
+                clear_cin_error();
+                wrong_input_log.log();
+                continue;
+            }
+
+            if (search_option == 0) {
+                auto search_res = club_table.read_activities_by_club(club_id);
+                if (search_res) {
+                    print_result_set(search_res);
+                }
+            } else if (search_option == 1) {
+                int act_id;
+                std::cout << "activity_id = ";
+                std::cin >> act_id;
+
+                if (std::cin.fail()) {
+                    clear_cin_error();
+                    wrong_input_log.log();
+                    continue;
+                }
+
+                auto search_res = club_table.read_activity_by_id(club_id, act_id);
+                if (search_res) {
+                    print_result_set(search_res);
+                }
+            } else if (search_option == 2) {
+                clear_cin_buffer();
+                std::string act_title;
+                std::cout << "activity_title = ";
+                std::getline(std::cin, act_title);
+
+                auto search_res = club_table.read_activity_by_title(club_id, act_title);
+                if (search_res) {
+                    print_result_set(search_res);
+                }
+            } else if (search_option == 3) {
+                clear_cin_buffer();
+                std::string from_date, to_date;
+                std::cout << "From date (YYYY-MM-DD) = ";
+                std::getline(std::cin, from_date);
+
+                std::cout << "To date (YYYY-MM-DD) = ";
+                std::getline(std::cin, to_date);
+
+                auto search_res = club_table.read_activity_by_period(club_id, from_date, to_date);
+                if (search_res) {
+                    print_result_set(search_res);
+                }
+            }
+        } else if (query_num == 2) {
+            clear_cin_buffer();
+            std::string act_title, start_date, end_date;
+
+            std::cout << "activity_title = ";
+            std::getline(std::cin, act_title);
+
+            std::cout << "start_date (YYYY-MM-DD, default: NOW) = ";
+            std::getline(std::cin, start_date);
+
+            std::cout << "end_date (YYYY-MM-DD, default: 2099-12-31) = ";
+            std::getline(std::cin, end_date);
+
+            club_table.create_activity_for_club(club_id, act_title, start_date, end_date);
+
+        } else if (query_num == 3) {
+            int act_id;
+            std::cout << "activity_id = ";
+            std::cin >> act_id;
+
+            if (std::cin.fail()) {
+                clear_cin_error();
+                wrong_input_log.log();
+                continue;
+            }
+
+            std::map<std::string, std::string> updates;
+            clear_cin_buffer();
+            std::string field_to_update, new_value;
+
+            while (true) {
+                std::cout << "Enter field to update (title, start_date, end_date or 'done' to finish): ";
+                std::cin >> field_to_update;
+
+                if (field_to_update == "done")
+                    break;
+
+                std::cout << "New value for " << field_to_update << ": ";
+                std::cin >> new_value;
+
+                updates[field_to_update] = new_value;
+            }
+
+            club_table.update_activity_for_club(club_id, act_id, updates);
+
+        } else if (query_num == 4) {
+            int act_id;
+            std::cout << "activity_id = ";
+            std::cin >> act_id;
+
+            if (std::cin.fail()) {
+                clear_cin_error();
+                wrong_input_log.log();
+                continue;
+            }
+
+            club_table.delete_activity_for_club(club_id, act_id);
+        } else if (query_num == 5) {
+            int activity_id;
+            std::cout << "Enter activity_id: ";
+            std::cin >> activity_id;
+
+            if (std::cin.fail()) {
+                clear_cin_error();
+                wrong_input_log.log();
+                continue;
+            }
+
+            if (!club_table.validate_activity_belongs_to_club(club_id, activity_id)) {
+                std::cout << "The activity does not belong to this club. Please enter a valid activity." << std::endl;
+                continue;
+            }
+
+            auto gatherings = gathering_table.read_gathering_by_act_id(activity_id);
+            if (!gatherings || gatherings->rowsCount() == 0) {
+                std::cout << "No gatherings found for this activity." << std::endl;
+                char create_option;
+                std::cout << "Would you like to create a new gathering? (y/n): ";
+                std::cin >> create_option;
+                clear_cin_buffer();
+
+                if (create_option == 'y' || create_option == 'Y') {
+                    std::string gathering_name;
+                    std::cout << "Enter gathering name: ";
+                    std::getline(std::cin, gathering_name);
+
+                    gathering_table.create_gathering(activity_id, gathering_name);
+                }
+            } else {
+                gatherings->next();
+                int gathering_id = gatherings->getInt("gathering_id");
+                gathering_menu(gathering_table, gathering_id);
+            }
+        }
+    }
+}
+
+void club_manage_menu(ClubTable &club_table, GatheringTable &gathering_table, int club_id) {
+    while (true) {
+        int query_num;
+        std::cout << "1. Manage\t2. Submit Result\t4. Return to Back" << std::endl;
+        std::cin >> query_num;
+
+        if (std::cin.fail()) {
+            clear_cin_error();
+        }
+
+        if (query_num == 4)
+            break;
+
+        if (query_num == 1) {
+            while (true) {
+                std::cout << "1. Members  2. Activities  3. Details  4. Return to Back" << std::endl;
+                int info_option;
+                std::cin >> info_option;
+
+                if (std::cin.fail()) {
+                    clear_cin_error();
+                }
+
+                if (info_option == 4)
+                    break;
+
+                if (info_option == 1) {
+                    club_members_menu(club_table, gathering_table, club_id);
+                } else if (info_option == 2) {
+                    club_activities_menu(club_table, gathering_table, club_id);
+                } else if (info_option == 3) {
+                    auto search_res = club_table.read_club_by_id(club_id);
+                    if (search_res)
+                        print_result_set(search_res);
+
+                    std::cout << "Update for: 1. Name  2. Budget  3. Professor ID  4. Return to back" << std::endl;
+                    int update_option;
+                    std::cin >> update_option;
+
+                    if (std::cin.fail() || update_option < 1 || update_option > 4) {
+                        clear_cin_error();
+                        wrong_input_log.log();
+                        continue;
+                    }
+
+                    if (update_option == 4) {
+                        continue;
+                    }
+
+                    if (update_option == 1) {
+                        clear_cin_buffer();
+                        std::string new_name;
+                        std::cout << "New Name = ";
+                        std::getline(std::cin, new_name);
+
+                        club_table.update_club_name(club_id, new_name);
+                    } else if (update_option == 2) {
+                        double new_budget;
+                        std::cout << "New Budget = ";
+                        std::cin >> new_budget;
+
+                        if (std::cin.fail()) {
+                            clear_cin_error();
+                            wrong_input_log.log();
+                            continue;
+                        }
+
+                        club_table.update_club_budget(club_id, new_budget);
+                    } else if (update_option == 3) {
+                        int new_prof_id;
+                        std::cout << "New Professor ID = ";
+                        std::cin >> new_prof_id;
+
+                        if (std::cin.fail()) {
+                            clear_cin_error();
+                            wrong_input_log.log();
+                            continue;
+                        }
+
+                        club_table.update_club_prof_id(club_id, new_prof_id);
+                    }
+                }
+            }
+        }
+    }
+}
+
+void club_menu(ClubTable &club_table, GatheringTable &gathering_table) {
+    while (true) {
+        int query_num;
+        std::cout << "0. info  1. search  2. create  3. delete  4. manage a club  5. Return to Menu" << std::endl;
         std::cin >> query_num;
 
         if (std::cin.fail()) {
@@ -312,7 +623,7 @@ void club_menu(ClubTable &club_table, ClubStudentTable &club_student_table) {
 void professor_menu(ProfessorTable &professor_table) {
     while (true) {
         int query_num;
-        std::cout << "0. info  \t1. search\t2. create\t3. delete\t 4. update name\n5. Return to Menu" << std::endl;
+        std::cout << "0. info  1. search  2. create  3. delete  4. update name  5. Return to Menu" << std::endl;
         std::cin >> query_num;
 
         if (std::cin.fail()) {
@@ -434,14 +745,15 @@ int main() {
     ClubTable club_table(con);
     ClubStudentTable club_student_table(con);
     ProfessorTable professor_table(con);
+    GatheringTable gathering_table(con);
 
     Logger(ll_info, "Initiation Done!").log();
 
     while (true) {
         int query_num;
         std::cout << "\n<<Select Table for Service>>\n\n";
-        std::cout << "1. Club\t\t2. Student\n3. Activity\t4. Gathering\n"
-                  << "5. Professor\t6. Result\n7. Location\t8. Equipment\n";
+        std::cout << "1. Club\t\t2. Student\n"
+                  << "3. Professor\t4. Result\n5. Location\t6. Equipment\n";
 
         std::cin >> query_num;
 
@@ -453,12 +765,12 @@ int main() {
 
         switch (query_num) {
         case 1:
-            club_menu(club_table, club_student_table);
+            club_menu(club_table, gathering_table);
             break;
         case 2:
             student_menu(student_table);
             break;
-        case 5:
+        case 3:
             professor_menu(professor_table);
         default:
             break;
