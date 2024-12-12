@@ -611,8 +611,8 @@ void club_menu(ClubTable &club_table, GatheringTable &gathering_table) {
             }
 
             auto res = club_table.read_club_by_id(club_id);
-            if (res) {
-                club_manage_menu(club_table, club_student_table, club_id);
+            if (res && res->rowsCount()) {
+                club_manage_menu(club_table, gathering_table, club_id);
             } else {
                 wrong_input_log.log();
             }
