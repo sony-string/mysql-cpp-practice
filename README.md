@@ -46,6 +46,12 @@ Ubuntu 24.04.1 LTS
    make test -j8
    ```
 
+# DB 초기화
+`db_scripts/club_init.sql` 을 MySQL 에서 실행하면 됩니다.
+```bash
+mysql -u root -p < db/scripts/club_init.sql
+```
+
 # 실행 방법
 
 우선 DB 서버에 대한 정보를 환경 변수로 등록하여야 합니다.
