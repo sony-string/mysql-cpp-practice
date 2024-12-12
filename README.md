@@ -22,6 +22,16 @@ Ubuntu 24.04.1 LTS
 
 # 빌드 방법
 
+## Prerequirements
+- Connector/C++ (MySQL API Library)
+```bash
+sudo apt install libmysqlcppconn-dev
+```
+- GCC(g++) / Make
+```bash
+sudo apt install build-essential
+```
+
 이 프로젝트는 Makefile을 사용하여 빌드됩니다. 다음 단계를 따라 빌드하고 실행할 수 있습니다:
 
 1. 저장소를 클론하여 로컬 환경에 다운로드합니다:
